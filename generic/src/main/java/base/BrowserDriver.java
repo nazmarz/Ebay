@@ -3,7 +3,9 @@ package base;
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.LogStatus;
 import org.codehaus.plexus.util.FileUtils;
-import org.openqa.selenium.*;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -12,10 +14,9 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
-import org.testng.annotations.Optional;
 import reporting.ExtentManager;
 import reporting.ExtentTestManager;
-import reporting.TestLogger;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -70,7 +71,7 @@ public class BrowserDriver {
         if (result.getStatus() == ITestResult.FAILURE) {
             captureScreenshot(driver, result.getName());
         }
-//        driver.quit();
+        driver.quit();
     }
     @AfterSuite
     public void generateReport() {
@@ -85,7 +86,7 @@ public class BrowserDriver {
     public static WebDriver driver = null;
 
 
-    @Parameters({"os", "os_version", "browserName", "browserVersion", "url"})
+    @Parameters({/*"useCloudEnv","cloudEnvName", */"os", "os_version", "browserName", "browserVersion", "url"})
     @BeforeMethod
     public void setUp(/*@Optional("false") boolean useCloudEnv, @Optional("false") String cloudEnvName,*/
             @Optional("windows") String os, @Optional("10") String os_version, @Optional("firefox") String browserName, @Optional("34")
@@ -93,33 +94,32 @@ public class BrowserDriver {
         getLocalDriver(browserName, os);
         driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS); // 20
         driver.manage().timeouts().pageLoadTimeout(45, TimeUnit.SECONDS); //35
+//        driver.manage().window().maximize();
         driver.get(url);
+
     }
 
     public WebDriver getLocalDriver(String browserName, String os) {
 
+
         if (browserName.equalsIgnoreCase("chrome")) {
 
             ChromeOptions options =new ChromeOptions();
-            // options.setHeadless(true);
             options.addArguments("--start-maximized");
             options.addArguments("--ignore-certificate-errors");
-            options.addArguments("--incognito");
-
             DesiredCapabilities capabilities = DesiredCapabilities.chrome();
             capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 
             if (os.equalsIgnoreCase("windows")) {
                 System.setProperty("webdriver.chrome.driver", "../Generic/drivers/windows/chromedriver.exe");
                 driver = new ChromeDriver(options);
-                  TestLogger.log("Chrome Browser Launched");
+                //  TestLogger.log("Chrome Browser Launched");
             } else if (os.equalsIgnoreCase("mac")) {
                 System.setProperty("webdriver.chrome.driver", "../Generic/drivers/mac/chromedriver");
                 driver = new ChromeDriver(options);
-                 TestLogger.log("Chrome Browser Launched");
+                // TestLogger.log("Chrome Browser Launched");
             }
         } else if (browserName.equalsIgnoreCase("firefox")) {
-
             FirefoxOptions options = new FirefoxOptions();
             options.addArguments("--start-maximized");
             options.addArguments("--ignore-certificate-errors");
@@ -158,6 +158,26 @@ public class BrowserDriver {
         } catch (Exception e) {
             System.out.println("Exception while taking screenshot "+e.getMessage());;
         }
+
+    }
+
+    /**
+     *
+     * @return current WebDriver instance
+     */
+
+    public static WebDriver  getDriver()
+    {
+        return driver;
+    }
+    /**
+     * This method returns the url.
+     *
+     * @return Returns the string.
+     */
+    public static String getUrl()
+    {
+        return driver.getCurrentUrl();
     }
 
 }
