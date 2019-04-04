@@ -19,8 +19,8 @@
 
         <!--<class name="test.pageobjects.HomePageTest"/>-->
         <!--<class name="test.pageobjects.ComputersPageTest"/>-->
-        <!--<class name="test.pageobjects.HardDrivePageTest"/>-->
-        <class name="test.pageobjects.SortPageTest"/>
+        <class name="test.pageobjects.HardDrivePageTest"/>
+
 
     </classes>
 
